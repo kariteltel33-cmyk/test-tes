@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظرسنجی مجتمع فرهنگی رفاهی </title>
+<!-- کتابخانه تولید اکسل -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box}
+body{font-family:Tahoma,sans-serif;background:#f5f5f5;margin:0;color:#111}
+.header{background:#222;color:#fff;text-align:center;padding:22px 16px}
+.header h1{font-size:19px;margin:0}
+.header p{font-size:13px;margin:6px 0 0;color:#ddd}
+.container{max-width:600px;margin:auto;padding:14px}
+.card{background:#fff;border:1px solid #ddd;border-radius:12px;padding:18px;margin-bottom:12px}
+.card h2{font-size:16px;margin:0 0 12px;padding-right:8px;border-right:4px solid #333}
+.card h3{font-size:14px;margin:16px 0 8px;background:#eee;border-radius:8px;padding:7px 10px}
+label{display:block;font-size:14px;margin:10px 0 6px}
+input[type=text],input[type=tel],select,textarea{width:100%;padding:12px;border:1px solid #bbb;border-radius:10px;font-size:14px;font-family:inherit;background:#fff}
+.hint{font-size:12px;color:#666;margin-top:4px;line-height:1.9}
+.score-guide{background:#f7f7f7;border:1px dashed #999;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:2;margin:8px 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{border:1px solid #bbb;border-radius:20px;padding:9px 14px;font-size:13px;margin:0;background:#fafafa;cursor:pointer}
+.chips input{display:none}
+.chips label:has(input:checked){background:#222;color:#fff;border-color:#222}
+.rate{display:flex;gap:4px;margin:8px 0 14px}
+.rate label{flex:1;text-align:center;border:1px solid #bbb;border-radius:10px;padding:11px 0;font-size:14px;background:#fafafa;margin:0;cursor:pointer}
+.rate input{display:none}
+.rate label:has(input:checked){background:#222;color:#fff}
+textarea{min-height:90px}
+.btn{width:100%;background:#222;color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-family:inherit;margin-top:8px;cursor:pointer;display:block;text-align:center;text-decoration:none}
+.btn-outline{width:100%;background:#fff;color:#222;border:2px solid #222;border-radius:12px;padding:13px;font-size:15px;font-family:inherit;margin-top:8px;cursor:pointer;display:block;text-align:center;text-decoration:none}
+.btn-excel{width:100%;background:#198754;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-family:inherit;margin-top:8px;cursor:pointer;display:block;text-align:center;text-decoration:none}
+.btn-eitaa{width:100%;background:#2a9d8f;color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-family:inherit;margin-top:8px;cursor:pointer;display:block;text-align:center;text-decoration:none}
+.thanks{display:none;text-align:center;padding:30px 18px}
+.thanks h3{font-size:18px;background:none;margin:0}
+#reportBox{display:none}
+.report-head{text-align:center;border-bottom:2px solid #222;padding-bottom:10px;margin-bottom:12px}
+.report-head h2{border:none;font-size:17px;margin:0;padding:0}
+.report-head p{font-size:13px;color:#444;margin:4px 0}
+.r-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+.r-table th,.r-table td{border:1px solid #bbb;padding:8px;text-align:right}
+.r-table th{background:#222;color:#fff;font-size:13px}
+.r-meta{background:#f7f7f7;border:1px solid #ddd;border-radius:10px;padding:10px 12px;font-size:13.5px;line-height:2}
+.r-photos img{width:90px;height:90px;object-fit:cover;border-radius:8px;border:1px solid #999;margin:4px}
+.upload{border:2px dashed #888;border-radius:12px;padding:16px;text-align:center;background:#fafafa}
+.upload input{display:none}
+.upload-btn{display:inline-block;background:#222;color:#fff;border-radius:10px;padding:11px 20px;font-size:14px;cursor:pointer}
+#preview{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;justify-content:center}
+#preview img{width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #999}
+/* پنجره خوش‌آمد */
+#welcome{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999;padding:18px;animation:fadeIn .6s ease}
+.w-box{background:#fff;border-radius:18px;max-width:480px;width:100%;padding:28px 22px;text-align:center;animation:popIn .8s ease;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.w-box h2{font-size:19px;margin:0;color:#222;animation:slideDown 1s ease}
+.w-box h4{font-size:14px;color:#b8860b;margin:8px 0 0;animation:slideDown 1.2s ease}
+.w-box p{font-size:14px;line-height:2.1;color:#333;margin:16px 0;animation:fadeUp 1.4s ease}
+.w-btn{background:#222;color:#fff;border:none;border-radius:12px;padding:14px 20px;font-size:15px;font-family:inherit;width:100%;cursor:pointer;margin-top:6px}
+.w-music{font-size:12px;color:#666;margin-top:10px}
+@keyframes popIn{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideDown{0%{transform:translateY(-25px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes fadeUp{0%{transform:translateY(25px);opacity:0}100%{transform:translateY(0);opacity:1}}
+.music-bar{position:sticky;top:0;z-index:50;background:#222;color:#fff;font-size:12.5px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.music-bar button{background:#fff;color:#222;border:none;border-radius:20px;padding:6px 14px;font-size:12.5px;font-family:inherit;cursor:pointer}
+@media print{
+body{background:#fff}
+.header,.container form#survey,.thanks .no-print,.music-bar,#welcome{display:none !important}
+.container{max-width:100%;padding:0}
+.card{border:none;margin:0}
+#reportBox{display:block !important}
+.thanks{display:block !important;border:none}
+}
+</style>
+</head>
+<body>
+
+<!-- موزیک آنلاین -->
+<audio id="bgMusic" src="https://mehrdl.musitraf.com/Music/A/D/Sonatibikalam/08.karevan_eshgh..mp3" loop preload="auto"></audio>
+
+<div class="music-bar">
+<span>🎵 موسیقی پس‌زمینه مجتمع </span>
+<button id="musicBtn" onclick="toggleMusic()">توقف موسیقی</button>
+</div>
+
+<!-- پیام خوش‌آمد انیمیشنی مدیریت -->
+<div id="welcome">
+<div class="w-box">
+<h2>به مجتمع فرهنگی رفاهی  خوش آمدید 🌹</h2>
+<h4>پیام مدیریت مجتمع</h4>
+<p>
+میهمان گرامی، حضور شما مایه افتخار ماست.<br>
+از اینکه وقت ارزشمند خود را برای تکمیل این نظرسنجی اختصاص می‌دهید، صمیمانه سپاسگزاریم.<br>
+نظر شما چراغ راه ماست برای میزبانی بهتر. نوش جان!
+</p>
+<button class="w-btn" onclick="enterSurvey()">ورود به فرم نظرسنجی</button>
+<div class="w-music">با ورود، موسیقی به‌صورت آنلاین پخش می‌شود 🎶</div>
+</div>
+</div>
+
+<div class="header">
+<h1>مجتمع فرهنگی رفاهی </h1>
+<p>فرم نظرسنجی مشتریان رستوران و فست‌فود</p>
+</div>
+<div class="container">
+
+<form id="survey" onsubmit="return sendForm(event)">
+<div class="card"><h2>۱. مشخصات مراجعه</h2>
+<label>نام مشتری</label>
+<input type="text" id="custName" placeholder="نام شما (اختیاری)">
+<label>تاریخ مراجعه (شمسی)</label>
+<input type="text" id="visitDate" inputmode="numeric" placeholder="مثال: ۱۴۰۵/۰۷/۱۹">
+<p class="hint">تاریخ به‌صورت خودکار به تقویم شمسی وارد می‌شود.</p>
+<label>وعده غذایی</label>
+<div class="chips"><label><input type="radio" name="meal" value="ناهار" checked><span>ناهار</span></label><label><input type="radio" name="meal" value="شام"><span>شام</span></label></div>
+</div>
+
+<div class="card"><h2>۲. غذای سفارش‌داده‌شده</h2>
+<h3>چلو</h3>
+<div class="chips">
+<label><input type="checkbox" class="food" value="چلومرغ طلائیه"><span>چلومرغ طلائیه</span></label>
+<label><input type="checkbox" class="food" value="چلو اکبرجوجه"><span>چلو اکبرجوجه</span></label>
+<label><input type="checkbox" class="food" value="چلوجوجه با استخوان"><span>چلوجوجه با استخوان</span></label>
+<label><input type="checkbox" class="food" value="چلوجوجه بی‌استخوان"><span>چلوجوجه بی‌استخوان</span></label>
+<label><input type="checkbox" class="food" value="چلوجوجه ترش"><span>چلوجوجه ترش</span></label>
+<label><input type="checkbox" class="food" value="چلوکباب لقمه"><span>چلوکباب لقمه</span></label>
+<label><input type="checkbox" class="food" value="چلوکباب نگین‌دار"><span>چلوکباب نگین‌دار</span></label>
+<label><input type="checkbox" class="food" value="چلوماهی قزل‌آلا"><span>چلوماهی قزل‌آلا</span></label>
+<label><input type="checkbox" class="food" value="زرشک‌پلو با مرغ"><span>زرشک‌پلو با مرغ</span></label>
+<label><input type="checkbox" class="food" value="چلوکره"><span>چلوکره</span></label>
+</div>
+<h3>خوراک</h3>
+<div class="chips">
+<label><input type="checkbox" class="food" value="خوراک مرغ طلائیه"><span>خوراک مرغ طلائیه</span></label>
+<label><input type="checkbox" class="food" value="خوراک اکبرجوجه"><span>خوراک اکبرجوجه</span></label>
+<label><input type="checkbox" class="food" value="خوراک مرغ / شنیسل"><span>خوراک مرغ / شنیسل</span></label>
+<label><input type="checkbox" class="food" value="خوراک جوجه"><span>خوراک جوجه</span></label>
+<label><input type="checkbox" class="food" value="خوراک کباب لقمه"><span>خوراک کباب لقمه</span></label>
+<label><input type="checkbox" class="food" value="خوراک کباب نگین‌دار"><span>خوراک کباب نگین‌دار</span></label>
+<label><input type="checkbox" class="food" value="خوراک ماهی"><span>خوراک ماهی</span></label>
+<label><input type="checkbox" class="food" value="سوپ جو"><span>سوپ جو</span></label>
+<label><input type="checkbox" class="food" value="کشک بادمجان"><span>کشک بادمجان</span></label>
+<label><input type="checkbox" class="food" value="کوفته تبریزی"><span>کوفته تبریزی</span></label>
+</div>
+<h3>فست‌فود</h3>
+<div class="chips">
+<label><input type="checkbox" class="food" value="پیتزا سبزیجات"><span>پیتزا سبزیجات</span></label>
+<label><input type="checkbox" class="food" value="پیتزا مرغ و قارچ"><span>پیتزا مرغ و قارچ</span></label>
+<label><input type="checkbox" class="food" value="پیتزا مخلوط"><span>پیتزا مخلوط</span></label>
+<label><input type="checkbox" class="food" value="پیتزا پپرونی"><span>پیتزا پپرونی</span></label>
+<label><input type="checkbox" class="food" value="پیتزا گوشت و قارچ"><span>پیتزا گوشت و قارچ</span></label>
+<label><input type="checkbox" class="food" value="ساندویچ کباب لقمه"><span>ساندویچ کباب لقمه</span></label>
+<label><input type="checkbox" class="food" value="ساندویچ فیله مرغ"><span>ساندویچ فیله مرغ</span></label>
+<label><input type="checkbox" class="food" value="ساندویچ هات‌داگ"><span>ساندویچ هات‌داگ</span></label>
+<label><input type="checkbox" class="food" value="همبرگر قارچ و پنیر"><span>همبرگر قارچ و پنیر</span></label>
+<label><input type="checkbox" class="food" value="مرغ کنتاکی سه‌تیکه"><span>مرغ کنتاکی سه‌تیکه</span></label>
+<label><input type="checkbox" class="food" value="سیب‌زمینی"><span>سیب‌زمینی</span></label>
+</div>
+<h3>نوشیدنی</h3>
+<div class="chips">
+<label><input type="checkbox" class="food" value="نوشابه"><span>نوشابه</span></label>
+<label><input type="checkbox" class="food" value="دلستر"><span>دلستر</span></label>
+<label><input type="checkbox" class="food" value="لیموناد"><span>لیموناد</span></label>
+<label><input type="checkbox" class="food" value="دوغ"><span>دوغ</span></label>
+<label><input type="checkbox" class="food" value="آب معدنی"><span>آب معدنی</span></label>
+</div>
+<h3>دسر، سالاد و مخلفات</h3>
+<div class="chips">
+<label><input type="checkbox" class="food" value="سالاد فصل"><span>سالاد فصل</span></label>
+<label><input type="checkbox" class="food" value="سالاد شیرازی"><span>سالاد شیرازی</span></label>
+<label><input type="checkbox" class="food" value="سالاد ماکارانی"><span>سالاد ماکارانی</span></label>
+<label><input type="checkbox" class="food" value="سالاد اندونزی"><span>سالاد اندونزی</span></label>
+<label><input type="checkbox" class="food" value="ماست موسیر / بورانی"><span>ماست موسیر / بورانی</span></label>
+<label><input type="checkbox" class="food" value="زیتون پرورده"><span>زیتون پرورده</span></label>
+<label><input type="checkbox" class="food" value="سیرترشی / ترشی / شور"><span>سیرترشی / ترشی / شور</span></label>
+</div>
+</div>
+
+<div class="card"><h2>۳. امتیازدهی به رستوران (۱ تا ۵)</h2>
+<div class="score-guide"><b>راهنمای امتیازدهی:</b><br>۵ = عالی و کاملاً راضی | ۴ = خوب و راضی | ۳ = متوسط | ۲ = ضعیف | ۱ = خیلی ضعیف و ناراضی</div>
+<label>طعم و مزه غذای رستوران</label><div class="rate"><label>۱<input type="radio" name="r1" value="1"></label><label>۲<input type="radio" name="r1" value="2"></label><label>۳<input type="radio" name="r1" value="3"></label><label>۴<input type="radio" name="r1" value="4"></label><label>۵<input type="radio" name="r1" value="5" checked></label></div>
+<label>کیفیت و تازگی مواد رستوران</label><div class="rate"><label>۱<input type="radio" name="r2" value="1"></label><label>۲<input type="radio" name="r2" value="2"></label><label>۳<input type="radio" name="r2" value="3"></label><label>۴<input type="radio" name="r2" value="4"></label><label>۵<input type="radio" name="r2" value="5" checked></label></div>
+<label>قیمت غذاهای رستوران</label><div class="rate"><label>۱<input type="radio" name="r3" value="1"></label><label>۲<input type="radio" name="r3" value="2"></label><label>۳<input type="radio" name="r3" value="3"></label><label>۴<input type="radio" name="r3" value="4"></label><label>۵<input type="radio" name="r3" value="5" checked></label></div>
+<label>برخورد پرسنل رستوران</label><div class="rate"><label>۱<input type="radio" name="r4" value="1"></label><label>۲<input type="radio" name="r4" value="2"></label><label>۳<input type="radio" name="r4" value="3"></label><label>۴<input type="radio" name="r4" value="4"></label><label>۵<input type="radio" name="r4" value="5" checked></label></div>
+<label>نظافت سالن و ظروف رستوران</label><div class="rate"><label>۱<input type="radio" name="r5" value="1"></label><label>۲<input type="radio" name="r5" value="2"></label><label>۳<input type="radio" name="r5" value="3"></label><label>۴<input type="radio" name="r5" value="4"></label><label>۵<input type="radio" name="r5" value="5" checked></label></div>
+</div>
+
+<div class="card"><h2>۴. امتیازدهی به فست‌فود (۱ تا ۵)</h2>
+<div class="score-guide"><b>راهنمای امتیازدهی:</b><br>۵ = عالی | ۴ = خوب | ۳ = متوسط | ۲ = ضعیف | ۱ = خیلی ضعیف</div>
+<label>طعم و مزه فست‌فود</label><div class="rate"><label>۱<input type="radio" name="f1" value="1"></label><label>۲<input type="radio" name="f1" value="2"></label><label>۳<input type="radio" name="f1" value="3"></label><label>۴<input type="radio" name="f1" value="4"></label><label>۵<input type="radio" name="f1" value="5" checked></label></div>
+<label>کیفیت و تازگی فست‌فود</label><div class="rate"><label>۱<input type="radio" name="f2" value="1"></label><label>۲<input type="radio" name="f2" value="2"></label><label>۳<input type="radio" name="f2" value="3"></label><label>۴<input type="radio" name="f2" value="4"></label><label>۵<input type="radio" name="f2" value="5" checked></label></div>
+<label>قیمت فست‌فود</label><div class="rate"><label>۱<input type="radio" name="f3" value="1"></label><label>۲<input type="radio" name="f3" value="2"></label><label>۳<input type="radio" name="f3" value="3"></label><label>۴<input type="radio" name="f3" value="4"></label><label>۵<input type="radio" name="f3" value="5" checked></label></div>
+<label>سرعت آماده‌سازی فست‌فود</label><div class="rate"><label>۱<input type="radio" name="f4" value="1"></label><label>۲<input type="radio" name="f4" value="2"></label><label>۳<input type="radio" name="f4" value="3"></label><label>۴<input type="radio" name="f4" value="4"></label><label>۵<input type="radio" name="f4" value="5" checked></label></div>
+<label>بسته‌بندی بیرون‌بر فست‌فود</label><div class="rate"><label>۱<input type="radio" name="f5" value="1"></label><label>۲<input type="radio" name="f5" value="2"></label><label>۳<input type="radio" name="f5" value="3"></label><label>۴<input type="radio" name="f5" value="4"></label><label>۵<input type="radio" name="f5" value="5" checked></label></div>
+</div>
+
+<div class="card"><h2>۵. آپلود عکس (اختیاری)</h2>
+<div class="upload">
+<label for="photo" class="upload-btn">انتخاب عکس</label>
+<input type="file" id="photo" accept="image/*" multiple onchange="previewPhoto(this)">
+<div id="preview"></div>
+<p class="hint" id="photoCount"></p>
+</div>
+</div>
+
+<div class="card"><h2>۶. نظر نهایی و پیگیری</h2>
+<label>رضایت کلی</label>
+<select id="satisfy"><option>خیلی راضی</option><option selected>راضی</option><option>متوسط</option><option>ناراضی</option><option>خیلی ناراضی</option></select>
+<label>معرفی به دیگران؟</label>
+<div class="chips"><label><input type="radio" name="sug" value="بله، حتماً" checked><span>بله، حتماً</span></label><label><input type="radio" name="sug" value="شاید"><span>شاید</span></label><label><input type="radio" name="sug" value="خیر"><span>خیر</span></label></div>
+<label>انتقاد یا پیشنهاد</label><textarea id="comment" placeholder="نظر شما..."></textarea>
+<label>شماره تلفن جهت پیگیری نارضایتی (دلخواه)</label>
+<input type="tel" id="phone" placeholder="۰۹...">
+<p class="hint">این شماره فقط برای تماس مدیریت در صورت نارضایتی استفاده می‌شود و اختیاری است.</p>
+<button class="btn" id="submitBtn" type="submit">ثبت نظرسنجی و ارسال فایل</button>
+</div>
+</form>
+
+<div class="thanks card" id="thanks">
+<h3>سپاسگزاریم!</h3>
+<p class="no-print" style="font-size:14px">نظر شما ثبت شد و فایل اکسل نیز مستقیماً به پیام‌رسان بله ارسال گردید.</p>
+<div id="reportBox" class="card" style="text-align:right">
+<div class="report-head">
+<h2>گزارش مدیریتی نظرسنجی مشتری</h2>
+<p>مجتمع فرهنگی رفاهی  ـ رستوران و فست‌فود</p>
+</div>
+<div class="r-meta" id="reportMeta"></div>
+<div id="reportTables"></div>
+<div class="r-photos" id="reportPhotos" style="text-align:center;margin-top:10px"></div>
+<p class="hint" style="text-align:center;margin-top:12px">این گزارش به‌صورت خودکار از فرم نظرسنجی تولید شده است.</p>
+</div>
+<button class="btn-excel no-print" onclick="downloadExcel()">دریافت مستقیم فایل اکسل (Excel)</button>
+<button class="btn no-print" onclick="printReport()">ذخیره گزارش به‌صورت PDF</button>
+<button class="btn-outline no-print" onclick="backToForm()">بازگشت به فرم</button>
+</div>
+
+</div>
+<script>
+// تنظیمات بله
+    const BALE_BOT_TOKEN = "1263272389:ScwT5LDJ6bhqD9Pb4Ix81K-VbOltFmCh6dw";
+    const TARGET_CHAT_ID = "1246213785"; // آیدی عددی خود را جایگزین کنید
+
+let currentExcelBlob = null;
+let currentFileName = "Survey.xlsx";
+
+try{document.getElementById('visitDate').value = new Date().toLocaleDateString('fa-IR');}catch(e){}
+var bgMusic=document.getElementById('bgMusic');
+bgMusic.volume=0.5;
+
+function enterSurvey(){
+document.getElementById('welcome').style.display='none';
+bgMusic.play().catch(function(){});
+window.scrollTo(0,0);
+}
+function toggleMusic(){
+if(bgMusic.paused){bgMusic.play();document.getElementById('musicBtn').textContent='توقف موسیقی';}
+else{bgMusic.pause();document.getElementById('musicBtn').textContent='پخش موسیقی';}
+}
+function previewPhoto(input){
+let box=document.getElementById('preview');box.innerHTML='';
+let n=input.files.length;
+document.getElementById('photoCount').textContent=n? n+' عکس انتخاب شد.':'';
+[...input.files].forEach(f=>{let r=new FileReader();r.onload=e=>{let img=document.createElement('img');img.src=e.target.result;box.appendChild(img);};r.readAsDataURL(f);});
+}
+function getRadio(name){let el=document.querySelector('input[name="'+name+'"]:checked');return el? el.value : '—';}
+function scoreText(v){
+if(v==='5') return '۵ (عالی)';
+if(v==='4') return '۴ (خوب)';
+if(v==='3') return '۳ (متوسط)';
+if(v==='2') return '۲ (ضعیف)';
+if(v==='1') return '۱ (خیلی ضعیف)';
+return '—';
+}
+
+async function sendForm(e){
+e.preventDefault();
+let submitBtn = document.getElementById('submitBtn');
+submitBtn.disabled = true;
+submitBtn.innerText = 'در حال ساخت فایل و ارسال...';
+
+let name=document.getElementById('custName').value.trim() || 'بدون نام';
+let date=document.getElementById('visitDate').value.trim() || new Date().toLocaleDateString('fa-IR');
+let meal=getRadio('meal');
+let foods=[...document.querySelectorAll('.food:checked')].map(x=>x.value);
+let foodsText=foods.length? foods.join(' ، ') : 'ثبت نشده';
+let rLabels=['طعم و مزه رستوران','کیفیت و تازگی رستوران','قیمت رستوران','برخورد پرسنل','نظافت سالن و ظروف'];
+let fLabels=['طعم فست‌فود','کیفیت و تازگی فست‌فود','قیمت فست‌فود','سرعت آماده‌سازی','بسته‌بندی بیرون‌بر'];
+let rVals=['r1','r2','r3','r4','r5'].map(getRadio);
+let fVals=['f1','f2','f3','f4','f5'].map(getRadio);
+let satisfy=document.getElementById('satisfy').value;
+let sug=getRadio('sug');
+let comment=document.getElementById('comment').value.trim() || '—';
+let phone=document.getElementById('phone').value.trim() || '—';
+
+document.title='گزارش مدیریتی - '+name+' - '+date;
+let meta='<b>نام مشتری:</b> '+escapeHtml(name)+'<br><b>تاریخ مراجعه (شمسی):</b> '+escapeHtml(date)+'<br><b>وعده:</b> '+escapeHtml(meal)+' &nbsp; | &nbsp; <b>رضایت کلی:</b> '+escapeHtml(satisfy)+' &nbsp; | &nbsp; <b>معرفی به دیگران:</b> '+escapeHtml(sug)+'<br><b>غذاهای سفارش‌داده‌شده:</b> '+escapeHtml(foodsText)+'<br><b>انتقاد/پیشنهاد:</b> '+escapeHtml(comment)+'<br><b>تلفن پیگیری:</b> '+escapeHtml(phone);
+document.getElementById('reportMeta').innerHTML=meta;
+
+let html='<table class="r-table"><tr><th>بخش</th><th>شاخص</th><th>امتیاز + توضیح</th></tr>';
+rLabels.forEach((t,i)=>{html+='<tr><td>رستوران</td><td>'+t+'</td><td>'+scoreText(rVals[i])+'</td></tr>';});
+fLabels.forEach((t,i)=>{html+='<tr><td>فست‌فود</td><td>'+t+'</td><td>'+scoreText(fVals[i])+'</td></tr>';});
+html+='</table><p class="hint">راهنما: ۵ عالی، ۴ خوب، ۳ متوسط، ۲ ضعیف، ۱ خیلی ضعیف</p>';
+document.getElementById('reportTables').innerHTML=html;
+
+let rp=document.getElementById('reportPhotos');rp.innerHTML='';
+let prev=document.querySelectorAll('#preview img');
+if(prev.length){let h='<p style="font-size:13px"><b>عکس‌های ضمیمه:</b></p>';prev.forEach(im=>{h+='<img src="'+im.src+'">';});rp.innerHTML=h;}
+
+// ساخت فایل استاندارد اکسل (Excel)
+let excelRows = [
+    ["شاخص / فیلد", "مقدار ثبت‌شده"],
+    ["نام مشتری", name],
+    ["تاریخ مراجعه", date],
+    ["وعده غذایی", meal],
+    ["غذاهای سفارش داده شده", foodsText],
+    ["میزان رضایت کلی", satisfy],
+    ["معرفی به دیگران", sug],
+    ["انتقاد یا پیشنهاد", comment],
+    ["شماره تماس پیگیری", phone],
+    ["---", "---"]
+];
+
+rLabels.forEach((t,i)=>{ excelRows.push(["رستوران: " + t, scoreText(rVals[i])]); });
+fLabels.forEach((t,i)=>{ excelRows.push(["فست‌فود: " + t, scoreText(fVals[i])]); });
+
+let wb = XLSX.utils.book_new();
+let ws = XLSX.utils.aoa_to_sheet(excelRows);
+XLSX.utils.book_append_sheet(wb, ws, "نظرسنجی");
+let excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+currentFileName = `Survey_${name}_${date.replace(/\//g,'-')}.xlsx`;
+currentExcelBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+// ارسال فایل اکسل به ربات بله
+sendExcelToBale(currentExcelBlob, currentFileName, `📊 فایل اکسل نظرسنجی جدید\n👤 مشتری: ${name}\n📅 تاریخ: ${date}`);
+
+document.getElementById('survey').style.display='none';
+document.getElementById('thanks').style.display='block';
+document.getElementById('reportBox').style.display='block';
+window.scrollTo(0,0);
+return false;
+}
+
+// تابع اختصاصی آپلود و ارسال فایل اکسل به بله
+function sendExcelToBale(blob, filename, caption) {
+    if (!TARGET_CHAT_ID || TARGET_CHAT_ID.includes("آیدی")) return;
+
+    let formData = new FormData();
+    formData.append("chat_id", TARGET_CHAT_ID);
+    formData.append("document", blob, filename);
+    formData.append("caption", caption);
+
+    let url = `https://tapi.bale.ai/bot${BALE_BOT_TOKEN}/sendDocument`;
+    
+    // ارسال مستقیم از طریق fetch
+    fetch(url, {
+        method: "POST",
+        body: formData,
+        mode: "no-cors"
+    }).catch(function(err){
+        console.log("خطا:", err);
+    });
+}
+
+function downloadExcel(){
+    if (currentExcelBlob) {
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(currentExcelBlob);
+        a.download = currentFileName;
+        a.click();
+    }
+}
+
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function printReport(){window.print();}
+function backToForm(){
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').innerText = 'ثبت نظرسنجی و ارسال فایل';
+    document.getElementById('thanks').style.display='none';
+    document.getElementById('survey').style.display='block';
+    window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
